@@ -5,45 +5,37 @@ from datetime import datetime, timedelta
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://thjwkelgihbtqtevcfyp.supabase.co")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 
-HEADERS = {
+SUPABASE_HEADERS = {
     "apikey": SUPABASE_KEY,
     "Authorization": f"Bearer {SUPABASE_KEY}",
     "Content-Type": "application/json"
 }
 
-# All Denver metro courses on GolfNow — IDs confirmed from golfnow.com URLs
+# Supreme Golf course slugs — from supremegolf.com URLs
 COURSES = [
-    # City of Denver Municipal
-    {"name": "City Park Golf Course",          "facility_id": 1946,  "location": "Denver",     "type": "Municipal"},
-    {"name": "Wellshire Golf Course",           "facility_id": 1790,  "location": "Denver",     "type": "Municipal"},
-    {"name": "Willis Case Golf Course",         "facility_id": 1944,  "location": "Denver",     "type": "Municipal"},
-    {"name": "Kennedy Golf Course",             "facility_id": 1942,  "location": "Denver",     "type": "Municipal"},
-    {"name": "Overland Park Golf Course",       "facility_id": 1948,  "location": "Denver",     "type": "Municipal"},
-    # Littleton / Southwest Denver
-    {"name": "Arrowhead Golf Club",             "facility_id": 453,   "location": "Littleton",  "type": "Public"},
-    {"name": "Raccoon Creek Golf Course",       "facility_id": 515,   "location": "Littleton",  "type": "Public"},
-    # Aurora
-    {"name": "CommonGround Golf Course",        "facility_id": 5275,  "location": "Aurora",     "type": "Public"},
-    {"name": "Murphy Creek Golf Course",        "facility_id": 17879, "location": "Aurora",     "type": "Public"},
-    {"name": "Saddle Rock Golf Course",         "facility_id": 17877, "location": "Aurora",     "type": "Public"},
-    {"name": "Meadow Hills Golf Course",        "facility_id": 17880, "location": "Aurora",     "type": "Public"},
-    {"name": "Aurora Hills Golf Course",        "facility_id": 17878, "location": "Aurora",     "type": "Municipal"},
-    {"name": "Heather Ridge Golf Course",       "facility_id": 9459,  "location": "Aurora",     "type": "Public"},
-    # Foothills / West Denver
-    {"name": "Foothills Golf Course",           "facility_id": 6826,  "location": "Denver",     "type": "Public"},
-    # Broomfield / North Denver
-    {"name": "Omni Interlocken Resort",         "facility_id": 594,   "location": "Broomfield", "type": "Resort"},
-    # Green Valley Ranch / NE Denver
-    {"name": "Green Valley Ranch Golf Club",    "facility_id": 517,   "location": "Denver",     "type": "Public"},
-    # Evergreen / Mountain
-    {"name": "Evergreen Golf Course",           "facility_id": 14331, "location": "Evergreen",  "type": "Public"},
+    {"name": "City Park Golf Course",       "slug": "city-park-golf-course-colorado",         "location": "Denver",     "type": "Municipal"},
+    {"name": "Wellshire Golf Course",        "slug": "wellshire-golf-course-colorado",          "location": "Denver",     "type": "Municipal"},
+    {"name": "Willis Case Golf Course",      "slug": "willis-case-golf-course-colorado",        "location": "Denver",     "type": "Municipal"},
+    {"name": "Kennedy Golf Course",          "slug": "kennedy-golf-course-colorado",            "location": "Denver",     "type": "Municipal"},
+    {"name": "Overland Park Golf Course",    "slug": "overland-park-golf-course-colorado",      "location": "Denver",     "type": "Municipal"},
+    {"name": "Arrowhead Golf Club",          "slug": "arrowhead-golf-club-colorado",            "location": "Littleton",  "type": "Public"},
+    {"name": "Raccoon Creek Golf Course",    "slug": "raccoon-creek-golf-course-colorado",      "location": "Littleton",  "type": "Public"},
+    {"name": "CommonGround Golf Course",     "slug": "commonground-golf-course-colorado",       "location": "Aurora",     "type": "Public"},
+    {"name": "Murphy Creek Golf Course",     "slug": "murphy-creek-golf-course-colorado",       "location": "Aurora",     "type": "Public"},
+    {"name": "Saddle Rock Golf Course",      "slug": "saddle-rock-golf-course-colorado",        "location": "Aurora",     "type": "Public"},
+    {"name": "Meadow Hills Golf Course",     "slug": "meadow-hills-golf-course-colorado",       "location": "Aurora",     "type": "Public"},
+    {"name": "Aurora Hills Golf Course",     "slug": "aurora-hills-golf-course-colorado",       "location": "Aurora",     "type": "Municipal"},
+    {"name": "Heather Ridge Golf Course",    "slug": "heather-ridge-golf-course-colorado",      "location": "Aurora",     "type": "Public"},
+    {"name": "Foothills Golf Course",        "slug": "foothills-golf-course-colorado",          "location": "Denver",     "type": "Public"},
+    {"name": "Green Valley Ranch Golf Club", "slug": "green-valley-ranch-golf-club-colorado",   "location": "Denver",     "type": "Public"},
+    {"name": "Evergreen Golf Course",        "slug": "evergreen-golf-course-colorado",          "location": "Evergreen",  "type": "Public"},
+    {"name": "Omni Interlocken Resort",      "slug": "omni-interlocken-resort-golf-club-colorado", "location": "Broomfield", "type": "Resort"},
 ]
 
 def ensure_course_exists(course):
-    """Make sure the course is in Supabase, insert if not."""
     res = requests.get(
         f"{SUPABASE_URL}/rest/v1/courses",
-        headers=HEADERS,
+        headers=SUPABASE_HEADERS,
         params={"name": f"eq.{course['name']}", "select": "id"},
         timeout=10
     )
@@ -51,22 +43,21 @@ def ensure_course_exists(course):
     if data:
         return data[0]["id"]
 
-    # Insert the course
     insert_res = requests.post(
         f"{SUPABASE_URL}/rest/v1/courses",
-        headers={**HEADERS, "Prefer": "return=representation"},
+        headers={**SUPABASE_HEADERS, "Prefer": "return=representation"},
         json={
             "name": course["name"],
             "location": course["location"],
             "course_type": course["type"],
-            "source": "GolfNow",
+            "source": "Supreme Golf",
             "holes": 18,
         },
         timeout=10
     )
     inserted = insert_res.json()
     if isinstance(inserted, list) and inserted:
-        print(f"  Added new course: {course['name']}")
+        print(f"  Added new course to DB: {course['name']}")
         return inserted[0]["id"]
     return None
 
@@ -74,7 +65,7 @@ def clear_old_tee_times():
     now = datetime.utcnow().isoformat()
     requests.delete(
         f"{SUPABASE_URL}/rest/v1/tee_times",
-        headers=HEADERS,
+        headers=SUPABASE_HEADERS,
         params={"tee_time": f"lt.{now}"},
         timeout=10
     )
@@ -83,43 +74,43 @@ def clear_old_tee_times():
 def save_tee_times(tee_times):
     if not tee_times:
         return
-    # Save in batches of 50
     for i in range(0, len(tee_times), 50):
         batch = tee_times[i:i+50]
         res = requests.post(
             f"{SUPABASE_URL}/rest/v1/tee_times",
-            headers={**HEADERS, "Prefer": "resolution=merge-duplicates"},
+            headers={**SUPABASE_HEADERS, "Prefer": "resolution=merge-duplicates"},
             json=batch,
             timeout=15
         )
-        print(f"  Batch {i//50 + 1}: saved {len(batch)} times, status {res.status_code}")
+        print(f"  Saved batch of {len(batch)}, status {res.status_code}")
 
-def scrape_golfnow(course, date, db_id):
-    """Scrape tee times for one course on one date."""
-    golfnow_headers = {
+def scrape_supreme_golf(course, date, db_id):
+    headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Referer": "https://www.golfnow.com/",
+        "Accept": "application/json",
+        "Referer": "https://supremegolf.com/",
+        "Origin": "https://supremegolf.com",
     }
 
-    url = "https://api.golfnow.com/v2/tee-times/search"
+    # Supreme Golf API endpoint
+    url = "https://supremegolf.com/api/search/tee-times"
     params = {
-        "facilityId": course["facility_id"],
         "date": date,
         "holes": 18,
         "players": 1,
-        "time": "0500-2000",
+        "courseSlug": course["slug"],
     }
 
     try:
-        res = requests.get(url, params=params, headers=golfnow_headers, timeout=15)
+        res = requests.get(url, params=params, headers=headers, timeout=15)
+        print(f"  {course['name']} on {date}: HTTP {res.status_code}")
 
         if res.status_code != 200:
-            print(f"  {course['name']}: HTTP {res.status_code}")
             return []
 
         data = res.json()
+
+        # Supreme Golf returns results in various structures
         times = []
         if isinstance(data, list):
             times = data
@@ -128,23 +119,23 @@ def scrape_golfnow(course, date, db_id):
                 data.get("teeTimes") or
                 data.get("tee_times") or
                 data.get("results") or
-                data.get("data") or []
+                data.get("data") or
+                data.get("times") or []
             )
 
         results = []
         for t in times:
             try:
                 time_str = (
-                    t.get("time") or
-                    t.get("teeTime") or
-                    t.get("startTime") or
-                    t.get("TeeTimes") or ""
+                    t.get("time") or t.get("teeTime") or
+                    t.get("startTime") or t.get("datetime") or ""
                 )
                 if not time_str:
                     continue
 
                 tee_dt = None
-                for fmt in ["%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S.%fZ"]:
+                for fmt in ["%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%SZ",
+                            "%Y-%m-%dT%H:%M:%S.%fZ", "%Y-%m-%d %H:%M:%S"]:
                     try:
                         tee_dt = datetime.strptime(time_str[:19], fmt)
                         break
@@ -162,15 +153,21 @@ def scrape_golfnow(course, date, db_id):
                     continue
 
                 price = float(
-                    t.get("rate") or t.get("price") or
+                    t.get("price") or t.get("rate") or
                     t.get("greenFee") or t.get("lowestRate") or
-                    t.get("GreenFee") or 0
+                    t.get("totalPrice") or 0
                 )
                 spots = int(
                     t.get("availableSpots") or t.get("spotsAvailable") or
-                    t.get("players") or t.get("Players") or 4
+                    t.get("players") or t.get("maxPlayers") or 4
                 )
-                holes = int(t.get("holes") or t.get("Holes") or 18)
+                holes = int(t.get("holes") or 18)
+
+                booking_url = (
+                    t.get("bookingUrl") or
+                    t.get("url") or
+                    f"https://supremegolf.com/explore/united-states/colorado/{course['location'].lower()}/{course['slug']}"
+                )
 
                 results.append({
                     "course_id": db_id,
@@ -178,7 +175,7 @@ def scrape_golfnow(course, date, db_id):
                     "price": price,
                     "spots_available": min(spots, 4),
                     "holes": holes,
-                    "source_url": f"https://www.golfnow.com/tee-times/facility/{course['facility_id']}/search",
+                    "source_url": booking_url,
                     "scraped_at": datetime.utcnow().isoformat(),
                 })
             except Exception as e:
@@ -191,8 +188,8 @@ def scrape_golfnow(course, date, db_id):
         return []
 
 def run():
-    print(f"\n--- OpenTee Scraper started at {datetime.now().strftime('%H:%M:%S')} ---")
-    print(f"Scraping {len(COURSES)} courses across Denver metro area")
+    print(f"\n--- OpenTee Scraper (Supreme Golf) started at {datetime.now().strftime('%H:%M:%S')} ---")
+    print(f"Scraping {len(COURSES)} Denver metro courses")
 
     if not SUPABASE_KEY:
         print("ERROR: SUPABASE_KEY not set.")
@@ -209,23 +206,22 @@ def run():
     for course in COURSES:
         db_id = ensure_course_exists(course)
         if not db_id:
-            print(f"  Skipping {course['name']} — could not get DB id")
+            print(f"  Skipping {course['name']} — no DB id")
             continue
 
         course_total = 0
         for date in dates:
-            times = scrape_golfnow(course, date, db_id)
+            times = scrape_supreme_golf(course, date, db_id)
             all_tee_times.extend(times)
             course_total += len(times)
 
-        print(f"  {course['name']} ({course['location']}): {course_total} times found")
+        print(f"  → {course['name']}: {course_total} total times")
 
     if all_tee_times:
         save_tee_times(all_tee_times)
-        print(f"\nDone. Total tee times saved: {len(all_tee_times)} across {len(COURSES)} courses")
+        print(f"\nDone. {len(all_tee_times)} tee times saved across {len(COURSES)} courses.")
     else:
-        print("\nNo tee times found this run. GolfNow API may require different auth.")
-        print("The scraper will keep retrying every 2 minutes automatically.")
+        print("\nNo tee times found. Will retry in 2 minutes.")
 
     print("--- Scraper finished ---\n")
 
