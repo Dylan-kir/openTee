@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OpenTee — Find Open Tee Times in Denver</title>
+  <meta name="description" content="Find last-minute golf tee times across all Denver courses in one place. GolfNow, GolfPass, Supreme Golf, City of Denver and more."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{font-family:'DM Sans',sans-serif;background:#f5f5f2;color:#1a1a1a;min-height:100vh;}
+    a{color:inherit;text-decoration:none;}
+
+    /* NAV */
+    .nav{background:#1a3d2b;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
+    .lw{display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none;}
+    .logo{font-family:'DM Serif Display',serif;font-size:22px;color:#fff;}
+    .logo span{color:#a8d8a8;}
+    .ltag{font-size:11px;color:#a8d8a8;margin-left:2px;}
+    .ntabs{display:flex;gap:3px;}
+    .ntab{background:none;border:none;color:#c8eac8;font-size:12px;font-weight:500;padding:6px 11px;border-radius:6px;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:4px;}
+    .ntab:hover{color:#fff;background:rgba(255,255,255,0.12);}
+    .ntab.active{color:#fff;background:rgba(255,255,255,0.2);}
+
+    /* HERO */
+    .hero{background:#1a3d2b;padding:1.25rem 1.5rem 1.75rem;position:relative;overflow:hidden;}
+    .hart{position:absolute;right:-8px;top:-8px;opacity:0.06;pointer-events:none;}
+    .sr1{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;max-width:900px;margin:0 auto 8px;position:relative;z-index:1;}
+    .sr2{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;max-width:900px;margin:0 auto;position:relative;z-index:1;}
+    .sf label{display:block;font-size:10px;font-weight:500;color:#a8d8a8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;}
+    .sf select,.sf input{width:100%;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:8px;padding:9px 11px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;appearance:none;-webkit-appearance:none;}
+    .sf select option{background:#1a3d2b;color:#fff;}
+    .sf select:focus,.sf input:focus{border-color:rgba(168,216,168,0.8);}
+    .sbtn{background:#4caf72;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;align-self:end;}
+    .sbtn:hover{background:#3d9960;}
+
+    /* STATS BAR */
+    .sbar{background:#163322;border-top:1px solid rgba(255,255,255,0.08);padding:.55rem 1.5rem;}
+    .sinn{max-width:900px;margin:0 auto;display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap;}
+    .si{display:flex;align-items:center;gap:5px;font-size:11px;color:#a8d8a8;}
+    .si strong{color:#d4f0d4;}
+    .pulse{display:inline-block;width:5px;height:5px;background:#4caf72;border-radius:50%;animation:pu 2s infinite;}
+    @keyframes pu{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+    /* MAIN */
+    .main{max-width:900px;margin:0 auto;padding:1.25rem 1.5rem;}
+
+    /* ALERT BAR */
+    .abar{background:#163322;border:1px solid #2d6e47;border-radius:11px;padding:.85rem 1.1rem;margin-bottom:1.1rem;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .abar-t strong{font-size:13px;color:#e8f8e8;font-weight:500;display:block;}
+    .abar-t span{font-size:11px;color:#a8d8a8;}
+    .abar-btn{background:#4caf72;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+    .abar-btn:hover{background:#3d9960;}
+
+    /* FILTER ROW */
+    .frow{display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem;flex-wrap:wrap;gap:8px;}
+    .rc{font-size:13px;color:#666;}
+    .rc strong{color:#1a1a1a;font-weight:500;}
+    .chips{display:flex;gap:5px;flex-wrap:wrap;}
+    .chip{font-size:11px;padding:4px 11px;border-radius:20px;border:0.5px solid #ddd;background:#fff;color:#666;cursor:pointer;transition:all 0.12s;}
+    .chip:hover,.chip.active{background:#1a3d2b;color:#a8d8a8;border-color:#1a3d2b;}
+    .srow{display:flex;align-items:center;gap:5px;margin-bottom:.9rem;}
+    .slbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.6px;}
+    .srt{font-size:11px;padding:4px 9px;border-radius:5px;border:0.5px solid #ddd;background:#fff;color:#666;cursor:pointer;transition:all 0.12s;}
+    .srt.active,.srt:hover{background:#1a3d2b;color:#a8d8a8;border-color:#1a3d2b;}
+
+    /* TEE CARD */
+    .tc{background:#fff;border:0.5px solid #e8e8e8;border-radius:12px;padding:.9rem 1.1rem .9rem 1.2rem;margin-bottom:8px;display:grid;grid-template-columns:66px 1fr auto auto;gap:12px;align-items:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.12s;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+    .tc:hover{border-color:#ccc;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+    .ca{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:12px 0 0 12px;}
+    .ca-g{background:#4caf72;}.ca-o{background:#e8a020;}.ca-r{background:#c94a4a;}
+    .tb{background:#1a3d2b;border-radius:8px;padding:7px 9px;text-align:center;}
+    .tb .tt{font-family:'DM Serif Display',serif;font-size:17px;line-height:1;color:#fff;}
+    .tb .ta{font-size:10px;color:#a8d8a8;font-weight:500;}
+    .cn{font-weight:500;font-size:14px;color:#1a1a1a;margin-bottom:3px;display:flex;align-items:center;gap:5px;}
+    .cm{font-size:11px;color:#888;display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+    .pill{font-size:10px;padding:2px 6px;border-radius:8px;font-weight:500;}
+    .pg{background:#e8f5ee;color:#2d6e47;border:0.5px solid #b8dfc8;}
+    .pb2{background:#e8f0fb;color:#2d4e8e;border:0.5px solid #b8ccf0;}
+    .dtag{color:#3d7a54;font-weight:500;}
+    .src{font-size:10px;padding:3px 7px;border-radius:4px;background:#f5f5f2;color:#888;border:0.5px solid #e8e8e8;white-space:nowrap;}
+    .pbox{text-align:right;}
+    .pv{font-size:16px;font-weight:500;color:#1a1a1a;margin-bottom:5px;}
+    .pv .pr{font-size:10px;font-weight:400;color:#888;}
+    .bkbtn{background:#4caf72;color:#fff;border:none;border-radius:6px;padding:6px 13px;font-size:12px;font-weight:500;cursor:pointer;}
+    .bkbtn:hover{background:#3d9960;}
+    .fvbtn{background:none;border:none;cursor:pointer;font-size:15px;padding:0 4px;color:#c8b84a;}
+    .dlbl{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.8px;margin:1rem 0 .45rem;display:flex;align-items:center;gap:6px;}
+    .dlbl::after{content:'';flex:1;height:0.5px;background:#eee;}
+    .lscan{font-size:11px;color:#aaa;text-align:center;margin-top:1.1rem;padding-top:.9rem;border-top:0.5px solid #eee;display:flex;align-items:center;justify-content:center;gap:5px;}
+
+    /* DETAIL OVERLAY */
+    .dov{position:fixed;top:0;left:0;right:0;bottom:0;background:#f5f5f2;z-index:200;overflow-y:auto;display:none;}
+    .dh{background:#1a3d2b;padding:1.25rem 1.5rem;position:relative;overflow:hidden;}
+    .dhart{position:absolute;right:0;bottom:-8px;opacity:0.07;pointer-events:none;}
+    .bk{background:rgba(255,255,255,0.15);border:none;color:#e8f8e8;border-radius:6px;padding:5px 11px;font-size:12px;cursor:pointer;margin-bottom:.65rem;font-family:'DM Sans',sans-serif;}
+    .bk:hover{background:rgba(255,255,255,0.22);}
+    .dn{font-family:'DM Serif Display',serif;font-size:22px;color:#fff;margin-bottom:3px;}
+    .dm{font-size:12px;color:#c8eac8;display:flex;gap:10px;flex-wrap:wrap;}
+    .dbody{max-width:900px;margin:0 auto;padding:1.25rem 1.5rem;}
+    .dst{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:.65rem;}
+    .icard{background:#fff;border:0.5px solid #e8e8e8;border-radius:10px;padding:.85rem 1rem;margin-bottom:1.25rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+    .ir{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:0.5px solid #f0f0f0;}
+    .ir:last-child{border-bottom:none;}
+    .ik{color:#888;}.iv{color:#1a1a1a;font-weight:500;}
+    .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;}
+    .tcard{background:#fff;border:0.5px solid #e8e8e8;border-radius:10px;padding:.7rem;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+    .tcard .tct{font-family:'DM Serif Display',serif;font-size:19px;color:#1a3d2b;}
+    .tcard .tcd{font-size:11px;color:#888;margin-bottom:5px;}
+    .tcard .tcp{font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:5px;}
+    .tcard .tcb{background:#4caf72;color:#fff;border:none;border-radius:5px;padding:5px 10px;font-size:11px;cursor:pointer;width:100%;}
+
+    /* MAP */
+    .mc{background:#fff;border:0.5px solid #e8e8e8;border-radius:12px;overflow:hidden;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+    .ma{position:relative;background:#dce8dc;height:300px;overflow:hidden;}
+    .mp{position:absolute;cursor:pointer;transform:translate(-50%,-100%);transition:transform 0.15s;}
+    .mp:hover{transform:translate(-50%,-100%) scale(1.15);}
+    .pin{background:#1a3d2b;color:#e8f8e8;border-radius:7px;padding:4px 8px;font-size:11px;font-weight:500;white-space:nowrap;position:relative;}
+    .pin::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a3d2b;border-bottom:none;}
+    .pin.ht{background:#4caf72;color:#fff;}.pin.ht::after{border-top-color:#4caf72;}
+    .mtt{position:absolute;background:#fff;border:0.5px solid #ddd;border-radius:8px;padding:.55rem .75rem;font-size:12px;z-index:5;pointer-events:none;min-width:130px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+    .mleg{padding:.65rem 1rem;display:flex;gap:14px;font-size:11px;color:#888;border-top:0.5px solid #eee;}
+    .ld{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:3px;}
+
+    /* ALERTS TAB */
+    .ahdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .ahdr-t{font-size:15px;font-weight:500;color:#1a1a1a;}
+    .ahdr-s{font-size:12px;color:#888;margin-top:1px;}
+    .nabtn{background:#4caf72;color:#fff;border:none;border-radius:7px;padding:7px 13px;font-size:12px;font-weight:500;cursor:pointer;}
+    .nabtn:hover{background:#3d9960;}
+    .ai{background:#fff;border:0.5px solid #e8e8e8;border-radius:10px;padding:.75rem .95rem;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+    .ai-ic{width:30px;height:30px;background:#e8f5ee;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .ai-tit{font-size:13px;font-weight:500;color:#1a1a1a;}
+    .ai-sub{font-size:11px;color:#888;margin-top:1px;}
+    .ai-del{margin-left:auto;background:none;border:none;color:#aaa;cursor:pointer;font-size:12px;padding:4px;}
+
+    /* MODAL */
+    .mbg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:300;display:none;align-items:center;justify-content:center;padding:1rem;}
+    .mbg.open{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:1.35rem;width:100%;max-width:450px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.18);}
+    .mhdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;}
+    .mtit{font-family:'DM Serif Display',serif;font-size:19px;color:#1a1a1a;}
+    .msubt{font-size:12px;color:#888;margin-top:2px;}
+    .mcls{background:none;border:none;font-size:18px;color:#aaa;cursor:pointer;padding:0;}
+    .msec{margin-bottom:.9rem;}
+    .msec label{display:block;font-size:10px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px;}
+    .mi{width:100%;background:#f5f5f2;border:0.5px solid #ddd;border-radius:7px;padding:9px 11px;font-size:13px;color:#1a1a1a;font-family:'DM Sans',sans-serif;outline:none;}
+    .mi:focus{border-color:#4caf72;}
+    .ms{width:100%;background:#f5f5f2;border:0.5px solid #ddd;border-radius:7px;padding:9px 11px;font-size:13px;color:#1a1a1a;font-family:'DM Sans',sans-serif;outline:none;appearance:none;-webkit-appearance:none;}
+    .ms:focus{border-color:#4caf72;}
+    .m2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .tog{display:flex;gap:5px;flex-wrap:wrap;}
+    .to{flex:1;min-width:55px;padding:7px 8px;border-radius:7px;border:0.5px solid #ddd;background:#f5f5f2;color:#666;font-size:12px;cursor:pointer;text-align:center;transition:all 0.12s;font-family:'DM Sans',sans-serif;}
+    .to.active{background:#1a3d2b;color:#a8d8a8;border-color:#1a3d2b;}
+    .msub-btn{width:100%;background:#4caf72;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:500;cursor:pointer;margin-top:.35rem;font-family:'DM Sans',sans-serif;}
+    .msub-btn:hover{background:#3d9960;}
+    .mnote{font-size:11px;color:#aaa;text-align:center;margin-top:.45rem;}
+    .sw{text-align:center;padding:.5rem 0;}
+    .si-ico{width:46px;height:46px;background:#e8f5ee;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .85rem;}
+    .si-tit{font-family:'DM Serif Display',serif;font-size:19px;color:#1a1a1a;margin-bottom:5px;}
+    .si-sub{font-size:13px;color:#666;margin-bottom:.9rem;line-height:1.5;}
+
+    /* FAVS */
+    .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:9px;}
+    .fcard{background:#fff;border:0.5px solid #e8e8e8;border-radius:10px;padding:.85rem .95rem;cursor:pointer;transition:border-color 0.12s;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+    .fcard:hover{border-color:#ccc;}
+
+    /* EMPTY STATE */
+    .empty{text-align:center;padding:3rem 1rem;color:#aaa;font-size:13px;line-height:1.7;}
+
+    @media(max-width:700px){
+      .sr1{grid-template-columns:1fr 1fr;}
+      .sr2{grid-template-columns:1fr 1fr;}
+      .sbtn{grid-column:span 2;}
+      .tc{grid-template-columns:58px 1fr auto;grid-template-rows:auto auto;}
+      .src{display:none;}
+      .pbox{grid-column:3;grid-row:1/3;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;}
+      .ltag{display:none;}
+      .sbar{display:none;}
+      .ntab .tl{display:none;}
+      .m2{grid-template-columns:1fr;}
+      .nav{padding:0 1rem;}
+      .hero{padding:1rem 1rem 1.5rem;}
+      .main{padding:1rem;}
+      .dbody{padding:1rem;}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="lw" href="/" onclick="switchTab('list');return false;">
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+      <ellipse cx="16" cy="27" rx="12" ry="3.5" fill="#2d6e47" opacity="0.4"/>
+      <ellipse cx="16" cy="27" rx="4.5" ry="1.5" fill="#0e2417"/>
+      <line x1="16" y1="27" x2="16" y2="9" stroke="#a8d8a8" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M16 9 L25 12.5 L16 16 Z" fill="#4caf72"/>
+      <circle cx="21" cy="25.5" r="2.5" fill="#fff"/>
+    </svg>
+    <div class="logo">Open<span>Tee</span></div>
+    <span class="ltag">find open tee times, fast</span>
+  </a>
+  <div class="ntabs">
+    <button class="ntab active" id="tab-list" onclick="switchTab('list')">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="2.5" rx="1" fill="currentColor"/><rect x="1" y="7" width="10" height="2.5" rx="1" fill="currentColor"/><rect x="1" y="12" width="12" height="2.5" rx="1" fill="currentColor"/></svg>
+      <span class="tl">Tee Times</span>
+    </button>
+    <button class="ntab" id="tab-map" onclick="switchTab('map')">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1C5.8 1 4 2.8 4 5c0 3 4 9 4 9s4-6 4-9c0-2.2-1.8-4-4-4z" fill="currentColor"/><circle cx="8" cy="5" r="1.4" fill="#1a3d2b"/></svg>
+      <span class="tl">Map</span>
+    </button>
+    <button class="ntab" id="tab-alerts" onclick="switchTab('alerts')">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1a1 1 0 011 1v.4A4.5 4.5 0 0112.5 7v3l1 1.5H2.5L3.5 10V7A4.5 4.5 0 017 2.4V2a1 1 0 011-1z" fill="currentColor"/><ellipse cx="8" cy="14.2" rx="1.4" ry=".9" fill="currentColor"/></svg>
+      <span class="tl">Alerts</span>
+    </button>
+    <button class="ntab" id="tab-favs" onclick="switchTab('favs')">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.8 3.6L14 6.3l-3 2.9.7 4.1L8 11.2l-3.7 2.1.7-4.1-3-2.9 4.2-.7z" fill="currentColor"/></svg>
+      <span class="tl">Favorites</span>
+    </button>
+  </div>
+</nav>
+
+<div class="hero">
+  <svg class="hart" width="200" height="160" viewBox="0 0 200 160" fill="none">
+    <circle cx="145" cy="55" r="50" stroke="white" stroke-width="1.4" fill="none"/>
+    <circle cx="133" cy="43" r="3.5" stroke="white" stroke-width="1" fill="none"/>
+    <circle cx="151" cy="38" r="3.5" stroke="white" stroke-width="1" fill="none"/>
+    <circle cx="163" cy="51" r="3.5" stroke="white" stroke-width="1" fill="none"/>
+    <circle cx="157" cy="65" r="3.5" stroke="white" stroke-width="1" fill="none"/>
+    <circle cx="139" cy="67" r="3.5" stroke="white" stroke-width="1" fill="none"/>
+    <line x1="190" y1="18" x2="190" y2="90" stroke="white" stroke-width="1.4"/>
+    <path d="M190 18 L203 27 L190 36 Z" fill="white" opacity="0.45"/>
+  </svg>
+  <div class="sr1">
+    <div class="sf"><label>Date</label><input type="date" id="date-in"/></div>
+    <div class="sf"><label>Players</label>
+      <select id="pl-in"><option value="1">1 player</option><option value="2" selected>2 players</option><option value="3">3 players</option><option value="4">4 players</option></select>
+    </div>
+    <div class="sf"><label>Holes</label>
+      <select id="h-in"><option value="any">Any holes</option><option value="9">9 holes</option><option value="18">18 holes</option></select>
+    </div>
+    <div class="sf"><label>Time of day</label>
+      <select id="tod-in"><option value="any">Any time</option><option value="morning">Morning (before noon)</option><option value="afternoon">Afternoon (noon–4pm)</option><option value="twilight">Twilight (4pm+)</option></select>
+    </div>
+    <button class="sbtn" onclick="applyFilter()">Search</button>
+  </div>
+  <div class="sr2">
+    <div class="sf"><label>Max price / player</label>
+      <select id="pr-in"><option value="any">Any price</option><option value="20">Under $20</option><option value="30">Under $30</option><option value="40">Under $40</option><option value="50">Under $50</option></select>
+    </div>
+    <div class="sf"><label>Max distance</label>
+      <select id="di-in"><option value="any">Any distance</option><option value="10">Within 10 mi</option><option value="20">Within 20 mi</option><option value="30">Within 30 mi</option></select>
+    </div>
+    <div class="sf"><label>Course type</label>
+      <select id="ty-in"><option value="any">Any type</option><option value="Municipal">Municipal</option><option value="Public">Public</option></select>
+    </div>
+    <div class="sf"><label>Your location</label>
+      <select id="lo-in" onchange="updateLoc()"><option value="denver">Denver</option><option value="aurora">Aurora</option><option value="littleton">Littleton</option><option value="evergreen">Evergreen</option></select>
+    </div>
+  </div>
+</div>
+
+<div class="sbar">
+  <div class="sinn">
+    <div class="si"><span class="pulse"></span><strong>9</strong> courses tracked</div>
+    <div class="si"><strong id="st-c">8</strong> times available now</div>
+    <div class="si">Scanned <strong>2 min ago</strong></div>
+    <div class="si" style="margin-left:auto;">GolfNow · GolfPass · Supreme Golf · City of Denver</div>
+  </div>
+</div>
+
+<!-- LIST VIEW -->
+<div class="main" id="view-list">
+  <div class="abar">
+    <div class="abar-t">
+      <strong>Not seeing what you want? Set a tee time alert.</strong>
+      <span>Get a text or email the moment a matching time opens up.</span>
+    </div>
+    <button class="abar-btn" onclick="openModal()">Set alert →</button>
+  </div>
+  <div class="frow">
+    <div class="rc"><strong id="count">8</strong> tee times in next 48 hrs</div>
+    <div class="chips">
+      <button class="chip active" onclick="setChip('all',this)">All</button>
+      <button class="chip" onclick="setChip('morning',this)">Morning</button>
+      <button class="chip" onclick="setChip('afternoon',this)">Afternoon</button>
+      <button class="chip" onclick="setChip('twilight',this)">Twilight</button>
+    </div>
+  </div>
+  <div class="srow">
+    <span class="slbl">Sort by</span>
+    <button class="srt active" id="sb-t" onclick="setSort('time',this)">Time</button>
+    <button class="srt" id="sb-p" onclick="setSort('price',this)">Price</button>
+    <button class="srt" id="sb-d" onclick="setSort('dist',this)">Distance</button>
+  </div>
+  <div id="results"></div>
+  <div class="lscan"><span class="pulse"></span>Live · GolfNow, GolfPass, Supreme Golf, City of Denver Golf + individual course sites</div>
+</div>
+
+<!-- MAP VIEW -->
+<div class="main" id="view-map" style="display:none;">
+  <div class="mc">
+    <div class="ma" id="map-area">
+      <svg width="100%" height="100%" viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;">
+        <rect width="700" height="300" fill="#dce8dc"/>
+        <rect x="310" y="0" width="8" height="300" fill="#c8d4c0"/><rect x="312" y="0" width="4" height="300" fill="#b8c8b0"/>
+        <rect x="0" y="118" width="700" height="8" fill="#c8d4c0"/><rect x="0" y="120" width="700" height="4" fill="#b8c8b0"/>
+        <rect x="0" y="226" width="380" height="5" fill="#c8d4c0" rx="2"/>
+        <rect x="200" y="0" width="3" height="300" fill="#d4ddd4"/><rect x="450" y="0" width="3" height="300" fill="#d4ddd4"/>
+        <rect x="0" y="70" width="700" height="3" fill="#d4ddd4"/><rect x="0" y="185" width="700" height="3" fill="#d4ddd4"/>
+        <ellipse cx="355" cy="85" rx="28" ry="20" fill="#b8d4b0" opacity="0.7"/>
+        <ellipse cx="215" cy="160" rx="22" ry="16" fill="#b8d4b0" opacity="0.7"/>
+        <ellipse cx="480" cy="155" rx="20" ry="15" fill="#b8d4b0" opacity="0.7"/>
+        <ellipse cx="160" cy="240" rx="25" ry="18" fill="#b8d4b0" opacity="0.7"/>
+        <text x="316" y="50" font-size="8" fill="#8a9e8a" font-family="DM Sans,sans-serif" transform="rotate(90,316,50)">I-25</text>
+        <text x="60" y="116" font-size="8" fill="#8a9e8a" font-family="DM Sans,sans-serif">I-70</text>
+        <text x="350" y="168" font-size="11" fill="#5a7a5a" font-family="DM Sans,sans-serif" text-anchor="middle" font-weight="500">Denver</text>
+      </svg>
+      <div id="map-pins"></div>
+      <div id="mtt" class="mtt" style="display:none;"></div>
+    </div>
+    <div class="mleg"><span><span class="ld" style="background:#4caf72;"></span>Has times now</span><span><span class="ld" style="background:#1a3d2b;"></span>No current times</span></div>
+  </div>
+  <div id="map-list"></div>
+</div>
+
+<!-- ALERTS VIEW -->
+<div class="main" id="view-alerts" style="display:none;">
+  <div class="ahdr">
+    <div><div class="ahdr-t">Your tee time alerts</div><div class="ahdr-s">Get notified the moment a match opens up.</div></div>
+    <button class="nabtn" onclick="openModal()">+ New alert</button>
+  </div>
+  <div id="alerts-list"></div>
+</div>
+
+<!-- FAVS VIEW -->
+<div class="main" id="view-favs" style="display:none;">
+  <div id="favs-content"></div>
+</div>
+
+<!-- COURSE DETAIL OVERLAY -->
+<div class="dov" id="dov">
+  <div class="dh">
+    <svg class="dhart" width="130" height="105" viewBox="0 0 130 105" fill="none"><circle cx="82" cy="42" r="38" stroke="white" stroke-width="1.1" fill="none"/><circle cx="72" cy="32" r="2.8" stroke="white" stroke-width=".9" fill="none"/><circle cx="87" cy="28" r="2.8" stroke="white" stroke-width=".9" fill="none"/><circle cx="95" cy="40" r="2.8" stroke="white" stroke-width=".9" fill="none"/><circle cx="91" cy="52" r="2.8" stroke="white" stroke-width=".9" fill="none"/><circle cx="76" cy="54" r="2.8" stroke="white" stroke-width=".9" fill="none"/></svg>
+    <button class="bk" onclick="closeDetail()">← Back</button>
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:3px;">
+      <svg width="16" height="16" viewBox="0 0 32 32" fill="none"><line x1="16" y1="26" x2="16" y2="8" stroke="#a8d8a8" stroke-width="1.5" stroke-linecap="round"/><path d="M16 8 L25 11.5 L16 15 Z" fill="#4caf72"/><circle cx="21" cy="24" r="2.6" fill="white" opacity="0.9"/></svg>
+      <div class="dn" id="d-name"></div>
+    </div>
+    <div class="dm" id="d-meta"></div>
+  </div>
+  <div class="dbody">
+    <div class="dst">Course info</div>
+    <div class="icard" id="d-info"></div>
+    <div class="dst" style="margin-top:1.1rem;">Available tee times</div>
+    <div class="tgrid" id="d-times"></div>
+  </div>
+</div>
+
+<!-- ALERT MODAL -->
+<div class="mbg" id="mbg">
+  <div class="modal">
+    <div id="m-form">
+      <div class="mhdr">
+        <div><div class="mtit">Set a tee time alert</div><div class="msubt">We'll notify you the moment a match opens up.</div></div>
+        <button class="mcls" onclick="closeModal()">✕</button>
+      </div>
+      <div class="msec">
+        <label>Notify me via</label>
+        <div class="tog">
+          <button class="to active" id="n-sms" onclick="setN('sms')">📱 Text</button>
+          <button class="to" id="n-email" onclick="setN('email')">✉ Email</button>
+          <button class="to" id="n-both" onclick="setN('both')">Both</button>
+        </div>
+      </div>
+      <div class="msec" id="f-ph"><label>Phone number</label><input class="mi" type="tel" id="a-ph" placeholder="(720) 555-0100"/></div>
+      <div class="msec" id="f-em" style="display:none;"><label>Email address</label><input class="mi" type="email" id="a-em" placeholder="you@example.com"/></div>
+      <div class="msec">
+        <label>Day(s)</label>
+        <div class="tog" id="dp">
+          <button class="to active" onclick="togDay(this,'any')">Any day</button>
+          <button class="to" onclick="togDay(this,'sat')">Sat</button>
+          <button class="to" onclick="togDay(this,'sun')">Sun</button>
+          <button class="to" onclick="togDay(this,'weekday')">Weekdays</button>
+        </div>
+      </div>
+      <div class="m2">
+        <div class="msec"><label>Time window</label>
+          <select class="ms" id="a-tod"><option value="any">Any time</option><option value="morning" selected>Morning (before noon)</option><option value="afternoon">Afternoon (noon–4pm)</option><option value="twilight">Twilight (4pm+)</option></select>
+        </div>
+        <div class="msec"><label>Players</label>
+          <select class="ms" id="a-pl"><option>1 player</option><option selected>2 players</option><option>3 players</option><option>4 players</option></select>
+        </div>
+      </div>
+      <div class="m2">
+        <div class="msec"><label>Holes</label>
+          <select class="ms" id="a-h"><option value="any">Any</option><option value="9">9 holes</option><option value="18">18 holes</option></select>
+        </div>
+        <div class="msec"><label>Max price / player</label>
+          <select class="ms" id="a-pr"><option value="any">Any</option><option value="20">Under $20</option><option value="30">Under $30</option><option value="40">Under $40</option><option value="50">Under $50</option></select>
+        </div>
+      </div>
+      <div class="msec"><label>Specific course (optional)</label>
+        <select class="ms" id="a-co">
+          <option value="any">Any course</option>
+          <option>Arrowhead Golf Club</option><option>City Park Golf Course</option><option>Wellshire Golf Course</option>
+          <option>Evergreen Golf Course</option><option>Willis Case Golf Course</option><option>Kennedy Golf Course</option>
+          <option>Overland Park Golf Course</option><option>Raccoon Creek Golf Course</option><option>CommonGround Golf Course</option>
+        </select>
+      </div>
+      <div class="msec"><label>Max distance (optional)</label>
+        <select class="ms" id="a-di"><option value="any">Any distance</option><option value="10">Within 10 miles</option><option value="20">Within 20 miles</option><option value="30">Within 30 miles</option></select>
+      </div>
+      <button class="msub-btn" onclick="submitAlert()">Create alert →</button>
+      <div class="mnote">Manage or delete alerts anytime from the Alerts tab.</div>
+    </div>
+    <div id="m-success" style="display:none;">
+      <div class="sw">
+        <div class="si-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#4caf72"/><path d="M7 12l3.5 3.5L17 8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="si-tit">Alert created!</div>
+        <div class="si-sub" id="suc-msg"></div>
+        <button class="msub-btn" onclick="closeModal()">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CRS=[
+  {id:1,name:'Arrowhead Golf Club',location:'Littleton',holes:18,par:70,yards:6682,type:'Public',pr:'$29–$55',src:'GolfNow',x:18,y:72,ht:true,dist:{denver:17,aurora:22,littleton:4,evergreen:18}},
+  {id:2,name:'City Park Golf Course',location:'Denver',holes:18,par:72,yards:6418,type:'Municipal',pr:'$25–$35',src:'City of Denver',x:51,y:28,ht:true,dist:{denver:3,aurora:12,littleton:14,evergreen:28}},
+  {id:3,name:'Wellshire Golf Course',location:'Denver',holes:18,par:71,yards:6298,type:'Municipal',pr:'$28–$38',src:'City of Denver',x:46,y:62,ht:true,dist:{denver:5,aurora:14,littleton:10,evergreen:25}},
+  {id:4,name:'Evergreen Golf Course',location:'Evergreen',holes:18,par:69,yards:5631,type:'Public',pr:'$32–$45',src:'Course site',x:10,y:55,ht:true,dist:{denver:26,aurora:34,littleton:16,evergreen:2}},
+  {id:5,name:'Willis Case Golf Course',location:'Denver',holes:18,par:72,yards:6339,type:'Municipal',pr:'$25–$32',src:'City of Denver',x:42,y:22,ht:true,dist:{denver:4,aurora:14,littleton:15,evergreen:28}},
+  {id:6,name:'Kennedy Golf Course',location:'Denver',holes:9,par:35,yards:3100,type:'Municipal',pr:'$15–$22',src:'City of Denver',x:56,y:68,ht:true,dist:{denver:6,aurora:10,littleton:12,evergreen:30}},
+  {id:7,name:'Overland Park Golf Course',location:'Denver',holes:18,par:72,yards:5962,type:'Municipal',pr:'$25–$34',src:'City of Denver',x:48,y:78,ht:true,dist:{denver:7,aurora:11,littleton:9,evergreen:28}},
+  {id:8,name:'Raccoon Creek Golf Course',location:'Littleton',holes:18,par:72,yards:7028,type:'Public',pr:'$35–$55',src:'Supreme Golf',x:36,y:85,ht:false,dist:{denver:18,aurora:22,littleton:5,evergreen:20}},
+  {id:9,name:'CommonGround Golf Course',location:'Aurora',holes:18,par:72,yards:7014,type:'Public',pr:'$35–$50',src:'GolfPass',x:72,y:48,ht:false,dist:{denver:12,aurora:3,littleton:18,evergreen:36}},
+];
+const TT=[
+  {time:'6:40',am:'AM',cid:1,price:42,spots:2,av:'high',day:'Today',tod:'morning',st:6.67},
+  {time:'8:10',am:'AM',cid:2,price:29,spots:4,av:'high',day:'Today',tod:'morning',st:8.17},
+  {time:'11:30',am:'AM',cid:3,price:34,spots:2,av:'medium',day:'Today',tod:'morning',st:11.5},
+  {time:'1:00',am:'PM',cid:4,price:38,spots:3,av:'medium',day:'Today',tod:'afternoon',st:13},
+  {time:'2:50',am:'PM',cid:5,price:28,spots:1,av:'low',day:'Today',tod:'afternoon',st:14.83},
+  {time:'4:30',am:'PM',cid:6,price:18,spots:4,av:'high',day:'Today',tod:'twilight',st:16.5},
+  {time:'5:10',am:'PM',cid:1,price:29,spots:2,av:'high',day:'Today',tod:'twilight',st:17.17},
+  {time:'7:20',am:'AM',cid:7,price:31,spots:4,av:'high',day:'Tomorrow',tod:'morning',st:7.33},
+];
+let chip='all',curView='list',favs=new Set([1,3]),loc='denver',sm='time';
+let nm='sms',selDays=new Set(['any']);
+let alts=[{id:1,day:'Saturday',tod:'Morning',pl:'2 players',h:'18',pr:'any',co:'Any course',via:'Text',ph:'(720) 555-0100',di:'any'}];
+const C=id=>CRS.find(c=>c.id===id);
+const gd=id=>C(id).dist[loc];
+const acl=a=>a==='high'?' ca-g':a==='medium'?' ca-o':' ca-r';
+const sp=n=>n===1?'1 spot left':`${n} spots`;
+const isFav=id=>favs.has(id);
+function togFav(id,e){e.stopPropagation();favs.has(id)?favs.delete(id):favs.add(id);renderAll();}
+function updateLoc(){loc=document.getElementById('lo-in').value;renderAll();}
+function getF(){
+  let f=[...TT];
+  if(chip!=='all')f=f.filter(t=>t.tod===chip);
+  const h=document.getElementById('h-in').value;
+  if(h!=='any')f=f.filter(t=>C(t.cid).holes===parseInt(h));
+  const p=document.getElementById('pr-in').value;
+  if(p!=='any')f=f.filter(t=>t.price<=parseInt(p));
+  const d=document.getElementById('di-in').value;
+  if(d!=='any')f=f.filter(t=>gd(t.cid)<=parseInt(d));
+  const ty=document.getElementById('ty-in').value;
+  if(ty!=='any')f=f.filter(t=>C(t.cid).type===ty);
+  if(sm==='price')f.sort((a,b)=>a.price-b.price);
+  else if(sm==='dist')f.sort((a,b)=>gd(a.cid)-gd(b.cid));
+  else f.sort((a,b)=>a.st-b.st);
+  return f;
+}
+function renderList(){
+  const f=getF();
+  document.getElementById('count').textContent=f.length;
+  document.getElementById('st-c').textContent=f.length;
+  if(!f.length){document.getElementById('results').innerHTML=`<div class="empty">No tee times match your filters.<br><button onclick="openModal()" style="margin-top:.75rem;background:#4caf72;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit;">Get notified when one opens up →</button></div>`;return;}
+  let html='',ld='';
+  f.forEach(t=>{
+    const c=C(t.cid);const d=gd(t.cid);
+    if(sm==='time'&&t.day!==ld){html+=`<div class="dlbl">${t.day}</div>`;ld=t.day;}
+    html+=`<div class="tc" onclick="openDetail(${c.id})">
+      <div class="ca${acl(t.av)}"></div>
+      <div class="tb"><div class="tt">${t.time}</div><div class="ta">${t.am}</div></div>
+      <div>
+        <div class="cn">
+          <svg width="11" height="11" viewBox="0 0 32 32" fill="none" style="flex-shrink:0;opacity:0.35"><line x1="16" y1="28" x2="16" y2="10" stroke="#1a3d2b" stroke-width="2" stroke-linecap="round"/><path d="M16 10 L24 13.5 L16 17 Z" fill="#4caf72"/></svg>
+          ${c.name}
+        </div>
+        <div class="cm">
+          <span>${c.location}</span>
+          <span>${c.holes} holes</span>
+          <span class="pill ${c.type==='Municipal'?'pb2':'pg'}">${c.type}</span>
+          <span class="dtag">◎ ${d} mi</span>
+          <span style="color:${t.av==='high'?'#2d6e47':t.av==='medium'?'#7a5010':'#8a2020'};font-weight:500;">${sp(t.spots)}</span>
+        </div>
+      </div>
+      <div class="src">${c.src}</div>
+      <div class="pbox">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-bottom:4px;">
+          <button class="fvbtn" onclick="togFav(${c.id},event)">${isFav(c.id)?'★':'☆'}</button>
+          <span class="pv">$${t.price}<span class="pr">/player</span></span>
+        </div>
+        <button class="bkbtn" onclick="event.stopPropagation()">Book →</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('results').innerHTML=html;
+}
+function openDetail(id){
+  const c=C(id);const d=gd(id);
+  document.getElementById('d-name').textContent=c.name;
+  document.getElementById('d-meta').innerHTML=`<span>${c.location}</span><span>${c.holes} holes · Par ${c.par}</span><span>${c.yards} yds</span><span>${c.type}</span><span>${d} mi away</span>`;
+  document.getElementById('d-info').innerHTML=`
+    <div class="ir"><span class="ik">Price range</span><span class="iv">${c.pr}/player</span></div>
+    <div class="ir"><span class="ik">Distance from ${loc.charAt(0).toUpperCase()+loc.slice(1)}</span><span class="iv">${d} miles</span></div>
+    <div class="ir"><span class="ik">Source</span><span class="iv">${c.src}</span></div>
+    <div class="ir"><span class="ik">Type</span><span class="iv">${c.type}</span></div>
+    <div class="ir"><span class="ik">Layout</span><span class="iv">${c.holes} holes · Par ${c.par} · ${c.yards} yds</span></div>`;
+  const times=TT.filter(t=>t.cid===id);
+  document.getElementById('d-times').innerHTML=times.length
+    ?times.map(t=>`<div class="tcard"><div class="tct">${t.time}</div><div class="tcd">${t.am} · ${t.day}</div><div class="tcp">$${t.price}/player</div><button class="tcb">Book</button></div>`).join('')
+    :`<div class="empty" style="padding:1rem 0;">No times in next 48 hrs.<br><button onclick="closeDetail();openModal();" style="margin-top:.5rem;background:#4caf72;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:inherit;">Set alert for this course →</button></div>`;
+  document.getElementById('dov').style.display='block';
+  window.scrollTo(0,0);
+}
+function closeDetail(){document.getElementById('dov').style.display='none';}
+function renderMap(){
+  const ctm={};getF().forEach(t=>{ctm[t.cid]=(ctm[t.cid]||0)+1;});
+  document.getElementById('map-pins').innerHTML=CRS.map(c=>`<div class="mp" style="left:${c.x}%;top:${c.y}%;" onmouseenter="showTip(event,${c.id})" onmouseleave="hideTip()" onclick="openDetail(${c.id})"><div class="pin${c.ht?' ht':''}">${c.name.split(' ')[0]}</div></div>`).join('');
+  document.getElementById('map-list').innerHTML=`<div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:.55rem;">All tracked courses</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">${CRS.map(c=>`<div style="background:#fff;border:0.5px solid #e8e8e8;border-radius:9px;padding:.65rem .85rem;cursor:pointer;display:flex;gap:7px;box-shadow:0 1px 3px rgba(0,0,0,0.04);" onclick="openDetail(${c.id})"><svg width="12" height="12" viewBox="0 0 32 32" fill="none" style="flex-shrink:0;margin-top:1px;"><line x1="16" y1="28" x2="16" y2="10" stroke="#1a3d2b" stroke-width="2" stroke-linecap="round"/><path d="M16 10 L24 13.5 L16 17 Z" fill="${ctm[c.id]?'#4caf72':'#ccc'}"/></svg><div><div style="font-weight:500;font-size:12px;color:#1a1a1a;margin-bottom:1px;">${c.name}</div><div style="font-size:11px;color:#888;">${c.location} · ${c.holes}h · ${gd(c.id)} mi</div><div style="font-size:11px;margin-top:2px;${ctm[c.id]?'color:#4caf72;font-weight:500;':'color:#aaa;'}">${ctm[c.id]?ctm[c.id]+' time'+(ctm[c.id]>1?'s':'')+' now':'No times now'}</div></div></div>`).join('')}</div>`;
+}
+function showTip(e,id){
+  const c=C(id);const times=TT.filter(t=>t.cid===id);
+  const tip=document.getElementById('mtt');
+  const r=document.getElementById('map-area').getBoundingClientRect();
+  const pr=e.target.closest('.mp').getBoundingClientRect();
+  tip.style.left=Math.min(pr.left-r.left-62,r.width-150)+'px';
+  tip.style.top=(pr.top-r.top-80)+'px';
+  tip.innerHTML=`<div style="font-weight:500;color:#1a1a1a;margin-bottom:1px;">${c.name}</div><div style="font-size:11px;color:#888;margin-bottom:2px;">${c.location} · ${gd(id)} mi · ${c.holes}h</div>${times.length?`<div style="color:#4caf72;font-weight:500;font-size:11px;">${times.length} time${times.length>1?'s':''} available</div>`:'<div style="font-size:11px;color:#aaa;">No times now</div>'}`;
+  tip.style.display='block';
+}
+function hideTip(){document.getElementById('mtt').style.display='none';}
+function renderAlerts(){
+  const el=document.getElementById('alerts-list');
+  if(!alts.length){el.innerHTML=`<div class="empty">No alerts yet. Hit "+ New alert" to get notified when a time opens up.</div>`;return;}
+  el.innerHTML=alts.map(a=>`<div class="ai"><div class="ai-ic"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1a1 1 0 011 1v.4A4.5 4.5 0 0112.5 7v3l1 1.5H2.5L3.5 10V7A4.5 4.5 0 017 2.4V2a1 1 0 011-1z" fill="#4caf72"/><ellipse cx="8" cy="14.2" rx="1.4" ry=".9" fill="#4caf72"/></svg></div><div><div class="ai-tit">${a.day} · ${a.tod} · ${a.pl}${a.h!=='any'?' · '+a.h+' holes':''}</div><div class="ai-sub">${a.co}${a.pr!=='any'?' · Max $'+a.pr+'/player':''} · via ${a.via}${a.ph?' to '+a.ph:''}</div></div><button class="ai-del" onclick="delAlt(${a.id})">✕</button></div>`).join('');
+}
+function delAlt(id){alts=alts.filter(a=>a.id!==id);renderAlerts();}
+function renderFavs(){
+  const el=document.getElementById('favs-content');
+  if(!favs.size){el.innerHTML=`<div class="empty">No favorites yet. Hit ☆ on any tee time to save a course.</div>`;return;}
+  el.innerHTML=`<div style="font-size:13px;color:#888;margin-bottom:.9rem;">Tap a course to see available times.</div><div class="fgrid">${CRS.filter(c=>favs.has(c.id)).map(c=>{const t=TT.filter(x=>x.cid===c.id);return `<div class="fcard" onclick="openDetail(${c.id})"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px;"><div style="display:flex;align-items:center;gap:5px;font-weight:500;font-size:13px;color:#1a1a1a;"><svg width="11" height="11" viewBox="0 0 32 32" fill="none"><line x1="16" y1="28" x2="16" y2="10" stroke="#1a3d2b" stroke-width="2" stroke-linecap="round"/><path d="M16 10 L24 13.5 L16 17 Z" fill="#4caf72"/></svg>${c.name}</div><button style="background:none;border:none;color:#c8b84a;cursor:pointer;font-size:13px;padding:0;" onclick="togFav(${c.id},event)">★</button></div><div style="font-size:11px;color:#888;margin-bottom:.4rem;">${c.location} · ${c.holes}h · ${gd(c.id)} mi · ${c.type}</div><div style="font-size:12px;${t.length?'color:#4caf72;font-weight:500;':'color:#aaa;'}">${t.length?t.length+' time'+(t.length>1?'s':'')+' available':'No times now'}</div></div>`;}).join('')}</div>`;
+}
+function renderAll(){renderList();if(curView==='map')renderMap();if(curView==='favs')renderFavs();if(curView==='alerts')renderAlerts();}
+function switchTab(v){
+  curView=v;
+  ['list','map','alerts','favs'].forEach(x=>{
+    document.getElementById('view-'+x).style.display=x===v?'block':'none';
+    document.getElementById('tab-'+x).classList.toggle('active',x===v);
+  });
+  if(v==='map')renderMap();if(v==='favs')renderFavs();if(v==='alerts')renderAlerts();
+}
+function setChip(f,el){chip=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderAll();}
+function applyFilter(){renderAll();}
+function setSort(s,el){sm=s;document.querySelectorAll('.srt').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderList();}
+function openModal(){document.getElementById('mbg').classList.add('open');document.getElementById('m-form').style.display='block';document.getElementById('m-success').style.display='none';}
+function closeModal(){document.getElementById('mbg').classList.remove('open');}
+function setN(t){nm=t;['sms','email','both'].forEach(x=>document.getElementById('n-'+x).classList.toggle('active',x===t));document.getElementById('f-ph').style.display=(t==='sms'||t==='both')?'block':'none';document.getElementById('f-em').style.display=(t==='email'||t==='both')?'block':'none';}
+function togDay(el,d){
+  if(d==='any'){selDays=new Set(['any']);}
+  else{selDays.delete('any');selDays.has(d)?selDays.delete(d):selDays.add(d);if(!selDays.size)selDays.add('any');}
+  document.querySelectorAll('#dp button').forEach(b=>{const bv=b.getAttribute('onclick').match(/'([^']+)'/)[1];b.classList.toggle('active',selDays.has(bv));});
+}
+function submitAlert(){
+  const tv=document.getElementById('a-tod').value;
+  const tl={any:'Any time',morning:'Morning',afternoon:'Afternoon',twilight:'Twilight'}[tv];
+  const pl=document.getElementById('a-pl').value;
+  const h=document.getElementById('a-h').value;
+  const pr=document.getElementById('a-pr').value;
+  const co=document.getElementById('a-co').value;
+  const di=document.getElementById('a-di').value;
+  const dl=selDays.has('any')?'Any day':[...selDays].map(d=>({sat:'Saturday',sun:'Sunday',weekday:'Weekdays'}[d]||d)).join(', ');
+  const via=nm==='sms'?'Text':nm==='email'?'Email':'Text & Email';
+  const ph=document.getElementById('a-ph').value;
+  alts.push({id:Date.now(),day:dl,tod:tl,pl,h,pr,co:co==='any'?'Any course':co,via,ph,di});
+  document.getElementById('suc-msg').textContent=`We'll notify you via ${via} when a ${tl.toLowerCase()} tee time for ${pl} opens up on ${dl.toLowerCase()}.`;
+  document.getElementById('m-form').style.display='none';
+  document.getElementById('m-success').style.display='block';
+}
+const td=new Date();
+document.getElementById('date-in').value=`${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}-${String(td.getDate()).padStart(2,'0')}`;
+renderList();
+</script>
+</body>
+</html>
